@@ -48,21 +48,23 @@ for i in range(len(slit_set_positions)):
 print("Scan finished.")
 
 # Define the Gaussian function
-def gauss(x, a, x0, sigma):
-    return a * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
+def gauss(x, slw, x0, sigma):
+    q0 = 10.1 # maximum charge with full beam
+    return q0 * slw * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2)) / (np.sqrt(2*np.pi)*sigma)
 
 print("Fitting beam profile to Gaussian distribution...")
 # give an initial guess
 guess = np.array([0.2, 30, 5])
 parameters, covariance = curve_fit(gauss, slit_positions, fc_charges, guess)
 
-fit_a, fit_x0, fit_sigma = parameters
+fit_slw, fit_x0, fit_sigma = parameters
 
 print("Fitting results:")
 print("RMS beam size: " + str(fit_sigma) + " mm")
 print("Center of beam: " + str(fit_x0) + " mm")
+print("Slit width: " + str(fit_slw) + " mm")
 
-fit_y = gauss(slit_positions, fit_a, fit_x0, fit_sigma)
+fit_y = gauss(slit_positions, fit_slw, fit_x0, fit_sigma)
 plt.plot(slit_positions, fc_charges, 'o', label='data')
 plt.plot(slit_positions, fit_y, '--', label='fit')
 plt.xlabel("Slit position [mm]")
